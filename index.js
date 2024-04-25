@@ -2,7 +2,7 @@ const express = require ('express');
 const app = express();
 const cors = require ('cors');
 require('dotenv').config()
-const port = process.env.PORT || 8000 ;
+const port = process.env.PORT || 9000 ;
 
 //middleware
 
@@ -46,12 +46,12 @@ async function run() {
     })
 
     // insert courses to database from instructor
-    app.post('/formCourses', async(req,res) =>{
-        const newFormCourses = req.body;
-        // console.log(newFormCourses);
-        const result = await formCourses.insertOne(newFormCourses);
-        res.send(result);
-    })
+    // app.post('/formCourses', async(req,res) =>{
+    //     const newFormCourses = req.body;
+    //     // console.log(newFormCourses);
+    //     const result = await formCourses.insertOne(newFormCourses);
+    //     res.send(result);
+    // })
 
     // insert users to database from instructor
     app.post('/users', async(req,res) =>{
@@ -60,7 +60,14 @@ async function run() {
         const result = await users.insertOne(newUser);
         res.send(result);
     })
-    
+
+    // only one instructor class
+    app.get('/formCourses/:email', async (req, res) => {
+      const email = req.params.email;
+      const result = await formCourses.find({ email: email }).toArray();
+      res.send(result);
+      });
+
 
 
     // Send a ping to confirm a successful connection
@@ -77,6 +84,12 @@ run().catch(console.dir);
 
 app.get( '/', (req,res) => {
     res.send('course selling server  is running')
+})
+
+// formCourses courses that are posted by instructors ....api
+app.get('/formCourses' , async (req,res) => {
+  const result = await formCourses.find().toArray();
+  res.send(result);
 })
 
 app.listen (port, () =>{
